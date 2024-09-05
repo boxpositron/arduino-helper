@@ -30,7 +30,7 @@ fi
 function get_devices() {
     device_list=$1
 
-    devices=$(echo "$device_list" | jq -r '.detected_ports[] | .matching_boards[0].name + " - " + .port.label + " - " + .port.protocol_label')
+    devices=$(echo "$device_list" | jq -r '.detected_ports[] | select(has("matching_boards") and has("port")) | .matching_boards[0].name + " - " + .port.label + " - " + .port.protocol_label')
     echo "$devices"
 
 }
@@ -61,7 +61,7 @@ function get_device_fbqn() {
     device_port=$(get_device_port "$device")
 
     # Select the fqbn from the device selected
-    fqbn=$(echo "$device_list" | jq -r --arg device_name "$device_name" --arg device_port "$device_port" '.detected_ports[] | select(.matching_boards[0].name == $device_name and .port.label == $device_port) | .matching_boards[0].fqbn')   
+    fqbn=$(echo "$device_list" | jq -r --arg device_name "$device_name" --arg device_port "$device_port" '.detected_ports[] | select(has("matching_boards") and has("port")) | select(.matching_boards[0].name == $device_name and .port.label == $device_port) | .matching_boards[0].fqbn')   
 
     echo "$fqbn"
 }
